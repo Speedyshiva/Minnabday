@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Minna | 5 April 2026</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Plus+Jakarta+Sans:wght@200;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --gold: #C5A059; --dark: #0A0A0A; }
+        
+        body { 
+            background-color: var(--dark); 
+            color: #F5F5F5; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        }
+
+        .playfair { font-family: 'Playfair Display', serif; }
+
+        section { 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 2.5rem; 
+            flex-direction: column; 
+            text-align: center;
+            background: transparent;
+        }
+        
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- 3D FLIP CARD --- */
+        .photo-card-container {
+            width: 90vw;
+            max-width: 350px;
+            height: 500px;
+            perspective: 2000px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+        .photo-flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .is-flipped { transform: rotateY(180deg); }
+
+        .photo-front, .photo-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+        }
+        
+        .photo-front { border: 1px solid rgba(255,255,255,0.1); }
+
+        .photo-back {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            border: 1px solid var(--gold);
+        }
+
+        /* Reason Cards */
+        .reason-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        /* Flame Animation */
+        .flame { animation: flicker 0.15s infinite alternate; transform-origin: center bottom; filter: drop-shadow(0 0 8px #FFD700); }
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+            100% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+        }
+
+        #nickname { display: inline-block; min-width: 120px; }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <audio id="bdayMusic" loop>
+        <source src="https://modern-black-cwqu5xfk4m.edgeone.app/another_year_minnaa.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Entrance Portal -->
+    <div id="loader" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-1000">
+        <h2 class="playfair italic text-gold text-2xl mb-8">For My Love💖</h2>
+        <button onclick="start()" class="border border-gold/40 text-gold px-14 py-4 rounded-full tracking-[0.3em] hover:bg-gold hover:text-black transition-all active:scale-95 uppercase text-xs">Open Surprise</button>
+    </div>
+
+    <main id="main-ui" class="hidden">
+        
+        <!-- Hero Section -->
+        <section>
+            <div class="reveal">
+                <span class="text-gold tracking-[0.5em] text-[10px] mb-4 block uppercase font-light">Celebrating You</span>
+                <h1 class="playfair text-7xl md:text-[11rem] leading-none mb-4 text-white">Minna.</h1>
+                <p class="playfair italic text-lg text-gold/60">April 5, 2026</p>
+            </div>
+        </section>
+
+        <!-- PHOTO SECTION -->
+        <section>
+            <div class="reveal text-center mb-12">
+                <h2 class="playfair italic text-4xl text-white mb-2">A Beautiful Soul❤️</h2>
+                <p class="text-gray-500 text-[10px] tracking-widest uppercase">(Tap on the photo)</p>
+            </div>
+
+            <div class="reveal photo-card-container" onclick="this.querySelector('.photo-flip-inner').classList.toggle('is-flipped')">
+                <div class="photo-flip-inner">
+                    <div class="photo-front">
+                        <img src="https://i.ibb.co/k6g1xd29/IMG-20260403-070322.jpg" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000">
+                    </div>
+                    <div class="photo-back">
+                        <span class="text-gold tracking-[0.4em] text-[9px] mb-6 uppercase">A Secret Note</span>
+                        <h3 class="playfair italic text-2xl mb-6 text-center">"You are the best part of my world."</h3>
+                        <p class="font-light text-gray-400 text-sm leading-relaxed text-center">
+                            Minna, another year of you being incredible. I am so lucky to have you in my life.
+                        </p>
+                        <span class="mt-10 text-[9px] text-gold/30 tracking-widest uppercase">Your Shiva Always With You</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EDITORIAL REASONS -->
+        <section>
+            <div class="max-w-4xl px-6">
+                <h2 class="reveal playfair italic text-3xl mb-16 text-white">Three Reasons Why...</h2>
+                <div class="grid md:grid-cols-3 gap-8 text-left">
+                    <div class="reveal p-8 reason-card rounded-xl">
+                        <p class="text-gold text-[10px] uppercase mb-4 tracking-widest">The Hope</p>
+                        <p class="text-sm font-light leading-relaxed text-gray-300">You are the light in my darkest days. You are the hope that keeps me going.</p>
+                    </div>
+                    <div class="reveal p-8 reason-card rounded-xl">
+                        <p class="text-gold text-[10px] uppercase mb-4 tracking-widest">The Smile</p>
+                        <p class="text-sm font-light leading-relaxed text-gray-300">It lights up the darkest days and makes everything feel possible.</p>
+                    </div>
+                    <div class="reveal p-8 reason-card rounded-xl">
+                        <p class="text-gold text-[10px] uppercase mb-4 tracking-widest">The Heart</p>
+                        <p class="text-sm font-light leading-relaxed text-gray-300">Kind, pure, and uniquely yours. I am forever grateful for your soul.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAKE FINALE -->
+        <section>
+            <div class="reveal mb-12" id="cake-container" onclick="makeWish()">
+                <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="cursor-pointer">
+                    <rect x="35" y="140" width="130" height="40" rx="4" fill="#151515" stroke="#C5A059" stroke-width="1.5"/>
+                    <rect x="60" y="105" width="80" height="35" rx="4" fill="#151515" stroke="#C5A059" stroke-width="1.5"/>
+                    <rect x="83" y="85" width="4" height="20" fill="#C5A059" rx="1"/>
+                    <path class="flame" d="M85 70C85 70 81 75 85 81C89 75 85 70 85 70Z" fill="#FFD700"/>
+                    <rect x="113" y="85" width="4" height="20" fill="#C5A059" rx="1"/>
+                    <path class="flame" d="M115 70C115 70 111 75 115 81C119 75 115 70 115 70Z" fill="#FFD700"/>
+                </svg>
+            </div>
+            
+            <div class="reveal min-h-[150px]">
+                <h2 id="wish-text" class="playfair italic text-5xl md:text-7xl leading-tight">Make a wish...</h2>
+                <p id="hint" class="text-gold/30 text-[10px] tracking-widest mt-6 uppercase">(Tap the cake)</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- BACKGROUND PARTICLES ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 80; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => { resize(); initParticles(); });
+        resize(); initParticles(); animate();
+
+        // --- CORE LOGIC ---
+        function start() {
+            document.getElementById('bdayMusic').play().catch(() => console.log("Audio enabled"));
+            document.getElementById('loader').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('loader').remove();
+                document.getElementById('main-ui').classList.remove('hidden');
+                initObserver();
+            }, 1000);
+        }
+
+        function initObserver() {
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            reveals.forEach(el => observer.observe(el));
+        }
+
+        // --- FINAL REVEAL & NICKNAME CYCLE ---
+        function makeWish() {
+            gsap.to(".flame", { opacity: 0, scale: 0, duration: 0.5 });
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.7 },
+                colors: ['#C5A059', '#FFFFFF', '#444444']
+            });
+
+            const wishText = document.getElementById('wish-text');
+            const hint = document.getElementById('hint');
+            if(hint) hint.remove();
+
+            // Set the main message with a placeholder for the nicknames
+            wishText.innerHTML = `Happy Birthday,<br>My <span id="nickname" class="text-gold">Love💝</span>`;
+            gsap.from(wishText, { y: 20, opacity: 0, duration: 1 });
+
+            // Nicknames to cycle through
+            const names = ["Baby🎀", "Billu🐱", "Cutu✨", "Sweety🍯", "Love💝"];
+            let idx = 0;
+
+            const changeName = () => {
+                const span = document.getElementById('nickname');
+                if(!span) return;
+                
+                gsap.to(span, {
+                    opacity: 0,
+                    y: -10,
+                    duration: 0.4,
+                    onComplete: () => {
+                        span.innerText = names[idx];
+                        gsap.to(span, { opacity: 1, y: 0, duration: 0.4 });
+                        idx = (idx + 1) % names.length;
+                    }
+                });
+            };
+
+            // Start the interval after a short delay
+            setTimeout(() => {
+                setInterval(changeName, 2000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
